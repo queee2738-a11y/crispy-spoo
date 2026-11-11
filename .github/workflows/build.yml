@@ -1,0 +1,31 @@
+name: Build mod
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Arrange files
+        run: |
+          mkdir -p src/main/java/com/example/watercube
+          mkdir -p src/main/resources/assets/watercube/textures/entity
+          mkdir -p src/main/resources/assets/watercube/lang
+          mv *.java src/main/java/com/example/watercube/
+          mv fabric.mod.json src/main/resources/
+          mv en_us.json src/main/resources/assets/watercube/lang/
+          mv water_cube.png src/main/resources/assets/watercube/textures/entity/
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.12
+      - run: gradle build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: watercube-jar
+          path: build/libs/*.jar
